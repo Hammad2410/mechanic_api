@@ -1,0 +1,18 @@
+{
+  "name": "mechanic_api",
+  "version": "1.0.0",
+  "description": "mechanic server",
+  "main": "index.js",
+  "dependencies": {
+    "db": "^3.1.0",
+    "express": "^4.17.1",
+    "pg": "^8.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "FAHAD",
+  "license": "ISC"
+}
