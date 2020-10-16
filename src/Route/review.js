@@ -16,6 +16,7 @@ reviewRoute.post("/get_review", (req, res) => {
                 message: error.message
             })
         }
+
         else {
             res.send({
                 success: true,
@@ -23,10 +24,10 @@ reviewRoute.post("/get_review", (req, res) => {
                 review: result.rows
             })
         }
+
     })
 
 })
-
 
 reviewRoute.post("/Add_review", (req, res) => {
 
@@ -52,6 +53,7 @@ reviewRoute.post("/Add_review", (req, res) => {
             })
 
         }
+
     })
 })
 

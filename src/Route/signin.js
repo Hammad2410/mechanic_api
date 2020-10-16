@@ -101,5 +101,126 @@ signinRoute.post("/login", (req, res) => {
     })
 })
 
+signinRoute.post("/setAvailability", (req, res) => {
+
+    var id = req.body.id
+    var time = JSON.stringify(req.body.time)
+
+    connection.query('UPDATE users SET "time" = $1 WHERE id = $2', [time, id], (error, result1) => {
+        if (error) {
+
+            res.send({
+                success: false,
+                message: error.message
+            })
+
+        }
+        else {
+
+            res.send({
+                success: true,
+                message: "Time is inserted"
+            })
+
+        }
+
+    })
+
+})
+
+signinRoute.post('/chooseOccupation', (req, res) => {
+    var tools = req.body.tools
+    var category = req.body.category
+    var service = req.body.service
+    var id = req.body.id
+
+    if (tools && category && service && id) {
+        connection.query("UPDATE users SET tools = $1, category = $2, service = $3 WHERE id = $4", [tools, category, service, id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Service Added"
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+signinRoute.post('/postCertificate', (req, res) => {
+    var id = req.body.id
+    var lic_country = req.body.lic_country
+    var lic_state = req.body.lic_state
+    var lic_number = req.body.lic_number
+    var vat_number = req.body.vat_number
+    var lic_expiry = req.body.lic_expiry
+    var specialization = req.body.specialization
+    var award = req.body.award
+    var award_year = req.body.award_year
+
+    if (id && lic_country && lic_state && lic_number && vat_number && lic_expiry) {
+        connection.query("INSERT INTO certificates(user_id, lic_country, lic_state, lic_number, vat_number, lic_expiry, specialization, award, award_year) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", [id, lic_country, lic_state, lic_number, vat_number, lic_expiry, specialization, award, award_year], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "certificate added"
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+
+})
+
+signinRoute.post('/getCertificates', (req, res) => {
+    var id = req.body.id
+
+    if (id) {
+        connection.query("SELECT * from  certificates WHERE user_id = $1", [id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "certificate fetched",
+                    certificate: result.rows
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
 
 module.exports = signinRoute
