@@ -1,4 +1,5 @@
 var express = require('express')
+const con = require('../db')
 var connection = require('../db')
 var homeRoute = express.Router()
 
@@ -166,6 +167,152 @@ homeRoute.get('/getRequests', (req, res) => {
         }
     })
 
+})
+
+homeRoute.post('/addQuote', (req, res) => {
+    var request_id = req.body.request_id
+    var services = JSON.stringify(req.body.services)
+    var note = req.body.note
+    var id = req.body.id
+
+    if (id && services && note && request_id) {
+        connection.query("INSERT INTO quote(request_id,services,note,mechanic_id) VALUES($1,$2,$3,$4)", [request_id, services, note, id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Quote Added"
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/getQuote', (req, res) => {
+    var id = req.body.request_id
+
+    if (id) {
+        connection.query("SELECT * FROM quote WHERE request_id = $1 ", [id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Quote Fetched",
+                    quotes: result.rows.map((item) => {
+                        return ({
+                            ...item,
+                            services: JSON.parse(item.services)
+                        })
+                    })
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/getMyQuote', (req, res) => {
+    var id = req.body.id
+
+    if (id) {
+        connection.query("SELECT * FROM quote WHERE mechanic_id = $1 ", [id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Quote Fetched",
+                    quotes: result.rows.map((item) => {
+                        return ({
+                            ...item,
+                            services: JSON.parse(item.services)
+                        })
+                    })
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/editQuote', (req, res) => {
+    var request_id = req.body.request_id
+    var services = JSON.stringify(req.body.services)
+    var note = req.body.note
+    var id = req.body.id
+
+    if (id && services && note && request_id) {
+        connection.query("UPDATE quote SET services = $1,note = $2 WHERE request_id = $3 AND mechanic_id = $4", [services, note, request_id, id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Quote Updated"
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/scheduleService', (req, res) => {
+
+    var location = JSON.stringify(req.body.location)
+    var appointment = req.body.appointment
+    var mechanic_id = req.body.mechanic_id
+    var request = JSON.stringify(req.body.request)
+    var services = JSON.stringify(req.body.services)
+    var id = req.body.id
+
+    if (location && appointment && mechanic_id && request && services && id) {
+        //connection.query("INSERT INTO services")
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
 })
 
 module.exports = homeRoute
