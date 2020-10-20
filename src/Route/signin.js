@@ -1,6 +1,9 @@
 var express = require('express')
 var connection = require('../db')
 var signinRoute = express.Router()
+var cloudinary = require('../cloudinary')
+var { upload } = require('../image-uploads')
+var fs = require('fs')
 
 signinRoute.post("/register", (req, res) => {
 
@@ -221,6 +224,45 @@ signinRoute.post('/getCertificates', (req, res) => {
         })
     }
 })
+
+signinRoute.post("/updateProfileImage", upload.single("image"), (req, res) => {
+    var id = req.body.id
+    var path = req.file.path
+
+    if (id && path) {
+
+        cloudinary.uploads(path, 'profile').then((image) => {
+            fs.unlinkSync(path)
+            connection.query("UPDATE users SET image = $1 WHERE id = $2", [image.url, id], (error, result) => {
+                if (error) {
+                    res.send({
+                        success: false,
+                        message: error.message
+                    })
+                }
+                else {
+                    res.send({
+                        success: true,
+                        message: "Profile Image updated"
+                    })
+                }
+            })
+        }).catch((error) => {
+            res.send({
+                success: false,
+                message: error.message
+            })
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+
 
 
 module.exports = signinRoute

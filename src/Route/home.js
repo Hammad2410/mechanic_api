@@ -305,7 +305,31 @@ homeRoute.post('/scheduleService', (req, res) => {
     var id = req.body.id
 
     if (location && appointment && mechanic_id && request && services && id) {
-        //connection.query("INSERT INTO services")
+        connection.query("INSERT INTO services(user_id,status,request,services,location,appointment,mechanic_id) VALUES($1,$2,$3,$4,$5,$6,$7) ", [id, "active", request, services, location, appointment, mechanic_id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                connection.query("UPDATE request SET status = 'accepted' WHERE id = $1", [req.body.request.id], (error1, result1) => {
+                    if (error1) {
+
+                        res.send({
+                            success: false,
+                            message: error1.message
+                        })
+                    }
+                    else {
+                        res.send({
+                            success: true,
+                            message: "order placed"
+                        })
+                    }
+                })
+            }
+        })
     }
     else {
         res.send({
@@ -314,5 +338,184 @@ homeRoute.post('/scheduleService', (req, res) => {
         })
     }
 })
+
+homeRoute.post('/getOrders', (req, res) => {
+    var id = req.body.id
+
+    if (id) {
+        connection.query("SELECT * FROM services WHERE mechanic_id = $1", [id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: 'Orders fetched',
+                    orders: result.rows.map((item) => {
+                        return ({
+                            ...item,
+                            request: JSON.parse(item.request),
+                            services: JSON.parse(item.services),
+                            location: JSON.parse(item.location)
+                        })
+                    })
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/getMyOrders', (req, res) => {
+    var id = req.body.id
+
+    if (id) {
+        connection.query("SELECT * FROM services WHERE user_id = $1", [id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: 'Orders fetched',
+                    orders: result.rows.map((item) => {
+                        return ({
+                            ...item,
+                            request: JSON.parse(item.request),
+                            services: JSON.parse(item.services),
+                            location: JSON.parse(item.location)
+                        })
+                    })
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/deliverOrder', (req, res) => {
+    var order_id = req.body.order_id
+
+    if (order_id) {
+        connection.query("UPDATE services SET status = 'delivered' WHERE id = $1", [order_id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Order delivered"
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/completeOrder', (req, res) => {
+    var order_id = req.body.order_id
+
+    if (order_id) {
+        connection.query("UPDATE services SET status = 'complete' WHERE id = $1", [order_id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Order completed"
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/cancelOrder', (req, res) => {
+    var order_id = req.body.order_id
+
+    if (order_id) {
+        connection.query("UPDATE services SET status = 'cancelled' WHERE id = $1", [order_id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Order cancelled"
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
+homeRoute.post('/deleteQuote', (req, res) => {
+    var id = req.body.quote_id
+
+    if (id && services && note && request_id) {
+        connection.query("UPDATE quote SET services = $1,note = $2 WHERE request_id = $3 AND mechanic_id = $4", [services, note, request_id, id], (error, result) => {
+            if (error) {
+                res.send({
+                    success: false,
+                    message: error.message
+                })
+            }
+            else {
+                res.send({
+                    success: true,
+                    message: "Quote Updated"
+                })
+            }
+        })
+    }
+    else {
+        res.send({
+            success: false,
+            message: "missing fields"
+        })
+    }
+})
+
 
 module.exports = homeRoute
