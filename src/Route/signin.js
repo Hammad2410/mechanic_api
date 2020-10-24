@@ -225,14 +225,19 @@ signinRoute.post('/getCertificates', (req, res) => {
     }
 })
 
-signinRoute.post("/updateProfileImage", upload.single("image"), (req, res) => {
+signinRoute.post("/updateProfileImage", (req, res) => {
     var id = req.body.id
-    var path = req.file.path
+    var image1 = req.body.image
 
-    if (id && path) {
+    console.log("image: ", id)
 
-        cloudinary.uploads(path, 'profile').then((image) => {
-            fs.unlinkSync(path)
+    if (id && image1) {
+
+        cloudinary.uploads(image1, 'profile').then((image) => {
+            // fs.unlinkSync(path)
+
+            console.log("image: ", image)
+
             connection.query("UPDATE users SET image = $1 WHERE id = $2", [image.url, id], (error, result) => {
                 if (error) {
                     res.send({

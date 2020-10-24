@@ -1,8 +1,11 @@
 var app = require('./src/server')
+
 const signinRoute = require('./src/Route/signin')
 const newaccountRoute = require('./src/Route/newaccount')
 const homeRoute = require('./src/Route/home')
 const reviewRoute = require('./src/Route/review')
+
+
 
 app.use('/services', homeRoute)
 app.use('/profile', signinRoute)
@@ -15,3 +18,7 @@ app.get('/api', (req, res) => {
         message: "server running"
     })
 })
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
