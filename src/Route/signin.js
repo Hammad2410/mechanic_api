@@ -4,11 +4,12 @@ var signinRoute = express.Router()
 var cloudinary = require('../cloudinary')
 var { upload } = require('../image-uploads')
 var fs = require('fs')
+var client = require('../twilio')
 
 signinRoute.post("/register", (req, res) => {
 
     var phone = req.body.phone
-    var otp = 1111
+    var otp = Math.floor(1000 + Math.random() * 9000)
 
     if (phone && otp) {
         connection.query("SELECT * FROM users WHERE phone = $1", [phone], (error, result) => {
@@ -32,7 +33,7 @@ signinRoute.post("/register", (req, res) => {
                             })
                         }
                         else {
-
+                            client(`Your verification code for Mechaniczuse is ${otp}`, phone)
                             res.send({
                                 success: true,
                                 message: "Users Registered"
@@ -53,6 +54,7 @@ signinRoute.post("/register", (req, res) => {
                         }
                         else {
 
+                            client(`Your verification code for Mechaniczuse is ${otp}`, phone)
                             res.send({
                                 success: true,
                                 message: "Users Registered"
