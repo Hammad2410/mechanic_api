@@ -10,6 +10,7 @@ signinRoute.post("/register", (req, res) => {
 
     var phone = req.body.phone
     var otp = Math.floor(1000 + Math.random() * 9000)
+    var role = req.body.role
 
     if (phone && otp) {
         connection.query("SELECT * FROM users WHERE phone = $1", [phone], (error, result) => {
@@ -43,7 +44,7 @@ signinRoute.post("/register", (req, res) => {
                     })
                 }
                 else {
-                    connection.query("Insert INTO users(Phone,otp)  VALUES($1,$2) ", [phone, otp], (error1, result1) => {
+                    connection.query("Insert INTO users(Phone,otp,role)  VALUES($1,$2) ", [phone, otp, role], (error1, result1) => {
 
                         if (error1) {
 
